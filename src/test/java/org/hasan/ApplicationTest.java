@@ -7,7 +7,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 public class ApplicationTest {
     @Test
-    public void testHome() {
+    public void testGetStatus() {
         Application app = new Application();
         assertThat(app.getStatus(), is("OK"));
     }

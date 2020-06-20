@@ -10,9 +10,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.Random;
+import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 
 public class ApplicationIT {
     private ObjectMapper mapper = new ObjectMapper();
@@ -48,14 +51,30 @@ public class ApplicationIT {
         assertThat(response.getBody().asString(), response.getStatusCode(), is(200));
 
         JsonNode jsonResponse = mapper.readTree(response.getBody().asString());
-        assertThat(jsonResponse.size(), is(2));
+        assertThat(jsonResponse.size(), greaterThanOrEqualTo(2));
 
-        assertThat(jsonResponse.get(0).get("username").asText(), is("user1"));
-        assertThat(jsonResponse.get(0).get("password").asText(), is("abc123"));
         assertThat(jsonResponse.get(0).get("emailAddress").asText(), is("user1@gmail.com"));
+        assertThat(jsonResponse.get(0).get("password").asText(), is("abc123"));
 
-        assertThat(jsonResponse.get(1).get("username").asText(), is("user2"));
-        assertThat(jsonResponse.get(1).get("password").asText(), is("letmein123"));
         assertThat(jsonResponse.get(1).get("emailAddress").asText(), is("user2@yahoo.com"));
+        assertThat(jsonResponse.get(1).get("password").asText(), is("letmein123"));
+    }
+
+    @Test
+    public void createUsersReturns200() {
+        // Given:
+        String randomUserName = UUID.randomUUID().toString();
+        RequestSpecification httpRequest = RestAssured.given()
+                .contentType(ContentType.JSON)
+                .body("{\n" +
+                        "    \"password\": \"mypassword\",\n" +
+                        "    \"emailAddress\": \"" + randomUserName + "@fastmail.com\"\n" +
+                        "}");
+
+        // When:
+        Response response = httpRequest.contentType(ContentType.JSON).post("/users");
+
+        // Then:
+        assertThat(response.getBody().asString(), response.getStatusCode(), is(200));
     }
 }

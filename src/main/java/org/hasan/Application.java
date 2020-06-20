@@ -2,16 +2,19 @@ package org.hasan;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @SpringBootApplication
@@ -25,19 +28,34 @@ public class Application {
     @RequestMapping(value = "/users", method= RequestMethod.GET)
     public List<User> getUsers() throws SQLException {
         // Hardcoded connection String only here for demo purposes
-        Connection con = DriverManager.getConnection("jdbc:postgresql://db:5432/postgres", "dockeruser", "docker");
+        Connection con = DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres", "dockeruser", "docker");
         Statement stmt = con.createStatement();
-        ResultSet rs = stmt.executeQuery("select * from account");
+        ResultSet rs = stmt.executeQuery("SELECT * FROM account");
 
         List<User> users = new ArrayList<>();
         while (rs.next()) {
-            users.add(new User(rs.getString("username"), rs.getString("password"), rs.getString("email")));
+            users.add(new User(rs.getString("email"), rs.getString("password")));
         }
         con.close();
         return users;
     }
 
+    @RequestMapping(value = "/users", method= RequestMethod.POST)
+    public void createUser(@RequestBody User newUser) throws SQLException {
+        // Hardcoded connection String only here for demo purposes
+        Connection con = DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres", "dockeruser", "docker");
+
+        PreparedStatement stmt = con.prepareStatement("INSERT INTO account(email, password) VALUES(?, ?)");
+        stmt.setString(1, newUser.getEmailAddress());
+        stmt.setString(2, newUser.getPassword());
+        int row = stmt.executeUpdate();
+        con.close();
+        return;
+    }
+
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+        SpringApplication app = new SpringApplication(Application.class);
+        app.setDefaultProperties(Collections.singletonMap("server.port", "9000"));
+        app.run(args);
     }
 }

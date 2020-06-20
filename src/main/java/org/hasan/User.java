@@ -1,24 +1,22 @@
 package org.hasan;
 
 public class User {
-    private String username;
     private String password;
     private String emailAddress;
 
-    public User(String username, String password, String emailAddress) {
-        this.username = username;
-        this.password = password;
+    // Needed for Jackson to generator JSON
+    public User() {}
+
+    public User(String emailAddress, String password) {
         this.emailAddress = emailAddress;
+        this.password = password;
     }
 
-    public String getUsername() {
-        return username;
+    public String getEmailAddress() {
+        return emailAddress;
     }
 
     public String getPassword() {
         return password;
-    }
-    public String getEmailAddress() {
-        return emailAddress;
     }
 }
