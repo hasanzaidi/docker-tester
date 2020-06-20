@@ -14,7 +14,7 @@ Run containers using:
 docker-compose up
 ```
 
-If you only want to run the db container you can run:
+If you only want to run the db container you can run (e.g. you are running the web app in the IDE):
 ```
 docker-compose -f docker-compose-dbonly.yml up
 ```
