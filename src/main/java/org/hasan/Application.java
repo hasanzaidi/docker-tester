@@ -20,6 +20,10 @@ import java.util.List;
 @SpringBootApplication
 @RestController
 public class Application {
+    private final String CONNECTION_STRING = "jdbc:postgresql://db:5432/postgres";
+    private final String DB_USER = "dockeruser";
+    private final String DB_PASSWORD = "docker";
+
     @RequestMapping(value = "/status", method= RequestMethod.GET)
     public String getStatus() {
         return "OK";
@@ -28,7 +32,7 @@ public class Application {
     @RequestMapping(value = "/users", method= RequestMethod.GET)
     public List<User> getUsers() throws SQLException {
         // Hardcoded connection String only here for demo purposes
-        Connection con = DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres", "dockeruser", "docker");
+        Connection con = DriverManager.getConnection(CONNECTION_STRING, DB_USER, DB_PASSWORD);
         Statement stmt = con.createStatement();
         ResultSet rs = stmt.executeQuery("SELECT * FROM account");
 
@@ -43,7 +47,7 @@ public class Application {
     @RequestMapping(value = "/users", method= RequestMethod.POST)
     public void createUser(@RequestBody User newUser) throws SQLException {
         // Hardcoded connection String only here for demo purposes
-        Connection con = DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres", "dockeruser", "docker");
+        Connection con = DriverManager.getConnection(CONNECTION_STRING, DB_USER, DB_PASSWORD);
 
         PreparedStatement stmt = con.prepareStatement("INSERT INTO account(email, password) VALUES(?, ?)");
         stmt.setString(1, newUser.getEmailAddress());
